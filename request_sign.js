@@ -1,3 +1,8 @@
+require('dotenv').config();
+const crypto = require("crypto");
+const secretKey = process.env.BASE_SECRET_KEY || "";
+
+
 function judgeEncryptSignValid(req) {
   const headers = req.headers;
   const body = req.body;
@@ -14,6 +19,8 @@ function judgeEncryptSignValid(req) {
     console.log("无签名加密");
     return true;
   }
+ 
+  console.log("secretKey:", secretKey);
   // 拼接字符串
   const str = timestamp + nonce + secretKey + JSON.stringify(body);
   // 创建SHA-1加密实例

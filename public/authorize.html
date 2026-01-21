@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>授权页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .permission-list {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .permission-item {
+            color: #555;
+            font-size: 13px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .permission-item::before {
+            content: "✓";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-authorize {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-authorize:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-message {
+            color: #667eea;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="authContent">
+            <div class="logo">🔐</div>
+            <h1>数据同步授权</h1>
+            <p class="description">
+                该应用需要获得您的数据访问权限，以便为您提供更好的服务体验。
+            </p>
+            
+            <div class="permission-list">
+                <div class="permission-item">访问用户基本信息</div>
+                <div class="permission-item">读取数据表元数据</div>
+                <div class="permission-item">访问数据记录</div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-authorize" id="authorizeBtn">立即授权</button>
+                <button class="btn-cancel" id="cancelBtn">取消</button>
+            </div>
+        </div>
+        
+        <div class="loading" id="loadingContent">
+            <div class="spinner"></div>
+            <p class="status-message" id="statusText">授权中，请稍候...</p>
+        </div>
+    </div>
+
+    <script>
+        // 从URL中获取userId
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userId');
+        const redirectUrl = urlParams.get('redirect_uri') || 'https://psychic-space-fishstick-6977gjp44rj2r9r6-3000.app.github.dev';
+
+        const authorizeBtn = document.getElementById('authorizeBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const authContent = document.getElementById('authContent');
+        const loadingContent = document.getElementById('loadingContent');
+        const statusText = document.getElementById('statusText');
+
+        // 授权按钮点击事件
+        authorizeBtn.addEventListener('click', () => {
+            if (!userId) {
+                alert('缺少userId参数');
+                return;
+            }
+
+            // 显示加载状态
+            authContent.style.display = 'none';
+            loadingContent.style.display = 'block';
+            statusText.textContent = '授权中，请稍候...';
+
+            // 模拟授权过程（1秒后完成）
+            setTimeout(() => {
+                statusText.textContent = '授权成功！';
+                
+                // 调用回调接口标记授权成功
+                fetch(`/api/auth/callback?state=${userId}&code=mock_code_${Date.now()}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log('授权成功', data);
+                        // 1秒后关闭窗口
+                        setTimeout(() => {
+                            window.close();
+                        }, 1000);
+                    })
+                    .catch(err => {
+                        console.error('授权失败', err);
+                        statusText.textContent = '授权失败，请重试';
+                        setTimeout(() => {
+                            authContent.style.display = 'block';
+                            loadingContent.style.display = 'none';
+                        }, 2000);
+                    });
+            }, 1000);
+        });
+
+        // 取消按钮点击事件
+        cancelBtn.addEventListener('click', () => {
+            window.close();
+        });
+
+        // 页面加载时检查userId
+        if (!userId) {
+            document.querySelector('h1').textContent = '参数错误';
+            document.querySelector('.description').textContent = '缺少userId参数，无法进行授权';
+            authorizeBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>

@@ -6,11 +6,11 @@ const getTableRecords = () => {
       {
         primaryId: "record_1",
         data: {
-          fid_1: "xxx",
-          fid_2: 1343,
+          fid_1: "张三123",
+          fid_2: 666,
           fid_3: "a",
           fid_5: 1697994894000,
-          fid_8: 1343.343443,
+          fid_8: 666.888,
           fid_9: 40,
           fid_10: 3,
           fid_12: { name: "链接文字", url: "HTTPS://xxx" },
@@ -31,8 +31,8 @@ const getTableRecords = () => {
       {
         primaryId: "record_2",
         data: {
-          fid_1: "yyy",
-          fid_2: 222.33344,
+          fid_1: "李四",
+          fid_2: 2.34,
           fid_3: "b",
           fid_4: ["b", "c"],
           fid_5: 1699999994000,
